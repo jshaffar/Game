@@ -1,8 +1,17 @@
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.concurrent.TimeUnit;
 
-class MazeCanvas extends Canvas {
+import javax.swing.JFrame;
+
+
+
+class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     // Description of state of maze. The value of maze[i][j] is
     // one of the constants WALL, PATH, EMPTY, or VISITED. (Value
     // can also be negative, temporarily, inside createMaze().)
@@ -13,7 +22,7 @@ class MazeCanvas extends Canvas {
     // already been explored without finding a solution, and by
     // EMPTY if it has not yet been explored.
     int[][] maze;
-
+    private int a =9;;;;;;;;;
     final static int BACKGROUND = 0;
     final static int WALL = 1;
     final static int PATH = 2;
@@ -29,11 +38,11 @@ class MazeCanvas extends Canvas {
 
     // Number of rows and columns of cells in maze, including
     // a wall around edges. Should be odd numbers.
-    int rows = 45;
-    int columns = 45;
+    int rows = 33;
+    int columns = 33;
 
     // Short delay between steps in making and solving maze
-    int speedSleep = 30;
+    int speedSleep = 2;
 
     // Graphics context for canvas, created in putSquare()
     Graphics me = null;
@@ -50,6 +59,9 @@ class MazeCanvas extends Canvas {
         super();
         setBackground(color[BACKGROUND]);
         maze = new int[rows][columns];
+        
+		 	/*.setDefaultCloseOperation
+	         (JFrame.EXIT_ON_CLOSE);*/
     }
 
     // Called every time something is about to be drawn to check
@@ -81,7 +93,7 @@ class MazeCanvas extends Canvas {
                            cellWidth, cellHeight);
             }
     }
-
+    
     // Draw one cell of the maze, to the graphics context "me".
     synchronized void putSquare(int row, int col, int colorNum) {
         if (checkSize() || me == null) {
@@ -95,11 +107,27 @@ class MazeCanvas extends Canvas {
         try { Thread.sleep(speedSleep); }
         catch (InterruptedException e) { }
     }
+    
+    synchronized void putSquare(int row, int col, Color c) {
+        if (checkSize() || me == null) {
+          if (me != null)
+              me.dispose(); // Get rid of old graphics context
+          me = getGraphics();
+        }
+        me.setColor(c);
+        me.fillRect(col*cellWidth + left, row*cellHeight + top,
+                    cellWidth, cellHeight);
+        try { Thread.sleep(speedSleep); }
+        catch (InterruptedException e) { }
+    }
  
     // Make a maze and then solve it.
     public void run() {
        makeMaze();
        solveMaze(1,1);
+       for(int f =0;f<=5;f++)
+       {
+       loseGraphics(Color.black,Color.white);}
     }
 
     // Create a random maze. The strategy is to start with a
@@ -195,6 +223,8 @@ class MazeCanvas extends Canvas {
     // position (row,col).  Return true if a solution is found.
     // The maze is considered to be solved if the path reaches the
     // lower right cell.
+
+    
     boolean solveMaze(int row, int col) {
         if (maze[row][col] == EMPTY) { 
             // Add this cell to the path.
@@ -220,4 +250,105 @@ class MazeCanvas extends Canvas {
         }
         return false;
     }
+    
+    public void move()
+    {
+    	
+    }
+    
+    public void loseGraphics(Color c,Color d) 
+    {
+    	speedSleep=0;
+    	for(int f =0;f<=10;f++)
+    	{
+	    	for(int i =0;i<rows;i++)
+	    	{
+	    		for(int j =0;j<columns;j++)
+	    		{
+	    			if(maze[i][j]==PATH||maze[i][j]==VISITED||maze[i][j]==EMPTY)
+	    			{
+	    				putSquare(i,j,c);
+	    			}
+	    			else
+	    			{
+	    				putSquare(i,j,d);
+	    			}
+	    			
+	    		}
+	    	}
+			try        
+			{
+			    Thread.sleep(1000);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
+	    	for(int i =0;i<rows;i++)
+	    	{
+	    		for(int j =0;j<columns;j++)
+	    		{
+	    			if(maze[i][j]==PATH||maze[i][j]==VISITED||maze[i][j]==EMPTY)
+	    			{
+	    				putSquare(i,j,d);
+	    			}
+	    			else
+	    			{
+	    				putSquare(i,j,c);
+	    			}
+	    			
+	    		}
+	    	}
+			try        
+			{
+			    Thread.sleep(1000);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
+			
+    	}
+    		
+    	
+    }
+    
+    
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int c = e.getKeyCode();
+    	if(c==KeyEvent.VK_LEFT)
+    		a=1;
+    	else if(c==KeyEvent.VK_RIGHT)
+    		a=2;
+    	else if(c==KeyEvent.VK_UP)
+    		a=3;
+    	else
+    		a=4;
+    	System.out.print(a);
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+    
+    
 }
