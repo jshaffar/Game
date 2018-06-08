@@ -1,4 +1,4 @@
-import java.awt.Canvas;
+\import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 
+import javafx.scene.shape.Circle;
+
+import java.awt.*;
 
 
 class MazeCanvas extends Canvas implements ActionListener, KeyListener {
@@ -22,27 +25,31 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     // already been explored without finding a solution, and by
     // EMPTY if it has not yet been explored.
     int[][] maze;
+    Rectangle[][] rect;
     private int a =9;;;;;;;;;
     final static int BACKGROUND = 0;
     final static int WALL = 1;
     final static int PATH = 2;
     final static int EMPTY = 3;
     final static int VISITED = 4;
+    
+   // final static Circle cir;
 
     // Colors associated with the preceding 5 constants
-    Color[] color = {Color.pink,
-                     Color.black,Color.magenta,
+    Color[] color = {Color.magenta,
+                     Color.black,Color.black,
                     // new Color(0, 0, 0),    // red
-                     Color.yellow, // blue
-                     new Color(51, 102, 204)};
-
+                     Color.green, // blue
+                     Color.black};
+    
+     
     // Number of rows and columns of cells in maze, including
     // a wall around edges. Should be odd numbers.
     int rows = 33;
     int columns = 33;
 
     // Short delay between steps in making and solving maze
-    int speedSleep = 2;
+    int speedSleep = 5;
 
     // Graphics context for canvas, created in putSquare()
     Graphics me = null;
@@ -59,6 +66,11 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
         super();
         setBackground(color[BACKGROUND]);
         maze = new int[rows][columns];
+       // addCircle();
+        /*
+        final Circle circle = new Circle(200, 150, 50, Color.magenta);
+        cir= new Circle(1,1,cellWidth/2,Color.magenta);*/
+       // rect= new Rectangle[rows][columns];
         
 		 	/*.setDefaultCloseOperation
 	         (JFrame.EXIT_ON_CLOSE);*/
@@ -83,6 +95,7 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     // Draws the entire maze.
     public void paint(Graphics g) {
         checkSize();
+        
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < columns; j++) {
                 if (maze[i][j] < 0)
@@ -92,6 +105,7 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
                 g.fillRect(j*cellWidth + left, i*cellHeight + top,
                            cellWidth, cellHeight);
             }
+       // g.fillOval(5,6,1,1);
     }
     
     // Draw one cell of the maze, to the graphics context "me".
@@ -120,15 +134,33 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
         try { Thread.sleep(speedSleep); }
         catch (InterruptedException e) { }
     }
+    
+    synchronized void removeSquare(int row, int col, int colornum) {
+        if (checkSize() || me == null) {
+          if (me != null)
+              me.dispose(); // Get rid of old graphics context
+          me = getGraphics();
+        }
+        me.setColor(color[4]);
+        me.fillRect(col*cellWidth + left, row*cellHeight + top,
+                    cellWidth, cellHeight);
+        try { Thread.sleep(speedSleep); }
+        catch (InterruptedException e) { }
+    }
  
     // Make a maze and then solve it.
     public void run() {
        makeMaze();
+     //  addBox(1,1,Color.magenta);
+       speedSleep=50;
+       
        solveMaze(1,1);
        for(int f =0;f<=5;f++)
-       {
-       loseGraphics(Color.black,Color.white);}
+       {}
+       //loseGraphics(Color.black,Color.white);}
     }
+    
+
 
     // Create a random maze. The strategy is to start with a
     // agrid of disconnnected "rooms" separated by walls and
@@ -226,10 +258,44 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
 
     
     boolean solveMaze(int row, int col) {
+    	if(maze[row][col]==PATH);
+    		putSquare(row,col,PATH);
         if (maze[row][col] == EMPTY) { 
             // Add this cell to the path.
             maze[row][col] = PATH;
             putSquare(row, col, PATH);
+            
+
+            // Path has reached goal.
+            if (row == rows-2 && col == columns-2)
+                return true;
+
+            // Try to solve maze by extending path in each
+            // possible direction.
+            if (solveMaze(row-1, col) ||
+                solveMaze(row, col-1) ||
+                solveMaze(row+1, col) ||
+                solveMaze(row, col+1))
+                return true;
+
+            // Maze can't be solved from this cell,
+            // so backtract out of the cell.
+            maze[row][col] = VISITED;
+            putSquare(row, col, VISITED);
+        }
+        return false;
+    }
+    
+    
+    boolean solveMaze(int row, int col,int dir) {//dir1=north,dir2=east,3=south,4=west
+    	
+        if (maze[row][col] == EMPTY) { 
+            // Add this cell to the path.
+            maze[row][col] = PATH;
+            putSquare(row, col, PATH);
+            
+            	
+            
 
             // Path has reached goal.
             if (row == rows-2 && col == columns-2)
