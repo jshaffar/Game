@@ -1,4 +1,4 @@
-\import java.awt.Canvas;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -43,6 +43,7 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
                      Color.black};
     
      
+    boolean done;
     // Number of rows and columns of cells in maze, including
     // a wall around edges. Should be odd numbers.
     int rows = 33;
@@ -61,7 +62,18 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     int cellHeight;   // height of cell
     int left;         // left edge of maze, allowing for border
     int top;          // top edge of maze, allowing for border
+    int speed;
     
+    public MazeCanvas(Color a,Color b, int speeds)
+    {
+    	
+    	super();
+    	color[0]=a;color[1]=b;color[2]=b;color[3]=a;color[4]=b;
+    	setBackground(color[BACKGROUND]);
+    	maze= new int[rows][columns];
+    	speed=speeds;
+    	
+    }
     public MazeCanvas() {
         super();
         setBackground(color[BACKGROUND]);
@@ -75,7 +87,10 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
 		 	/*.setDefaultCloseOperation
 	         (JFrame.EXIT_ON_CLOSE);*/
     }
-
+    public boolean getDone()
+    	{
+    		return done;
+    	}
     // Called every time something is about to be drawn to check
     // the canvas size and adjust variables that depend on the size.
     // Returns true if the size has changed.
@@ -152,7 +167,7 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     public void run() {
        makeMaze();
      //  addBox(1,1,Color.magenta);
-       speedSleep=50;
+       speedSleep=speed;
        
        solveMaze(1,1);
        for(int f =0;f<=5;f++)
@@ -218,29 +233,22 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
                   maze[i][j] = EMPTY;
     }
 
-    // Tear down a wall, unless doing so will form a loop. Tearing
-    // down a wall joins two "rooms" into one "room". (Rooms begin
-    // to look like corridors as they grow.) When a wall is torn down,
-    // the room codes on one side are converted to match those on the
-    // other side, so all the cells in a room have the same code.
-    // Note that if the room codes on both sides of a wall already have
-    // the same code, then tearing down that wall would create a loop,
-    // so the wall is left in place.
+
     void tearDown(int row, int col) {
         if (row%2 == 1 && maze[row][col-1] != maze[row][col+1]) {
-            // Row is odd; wall separates rooms horizontally.
+   
             fill(row, col-1, maze[row][col-1], maze[row][col+1]);
             maze[row][col] = maze[row][col+1];
             putSquare(row, col, EMPTY);
         } else if (row%2 == 0 && maze[row-1][col] != maze[row+1][col]) {
-            // Row is even; wall separates rooms vertically.
+
             fill(row-1, col, maze[row-1][col], maze[row+1][col]);
             maze[row][col] = maze[row+1][col];
             putSquare(row, col, EMPTY);
         }
     }
 
-    // Called by tearDown() to change "room codes".
+ 
     void fill(int row, int col, int replace, int replaceWith) {
         if (maze[row][col] == replace) {
             maze[row][col] = replaceWith;
@@ -251,27 +259,23 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
         }
     }
 
-    // Try to solve the maze by continuing current path from
-    // position (row,col).  Return true if a solution is found.
-    // The maze is considered to be solved if the path reaches the
-    // lower right cell.
+
 
     
     boolean solveMaze(int row, int col) {
     	if(maze[row][col]==PATH);
     		putSquare(row,col,PATH);
         if (maze[row][col] == EMPTY) { 
-            // Add this cell to the path.
+        
             maze[row][col] = PATH;
             putSquare(row, col, PATH);
             
 
-            // Path has reached goal.
+           
             if (row == rows-2 && col == columns-2)
-                return true;
+            {	done=true;
+                return true; }
 
-            // Try to solve maze by extending path in each
-            // possible direction.
             if (solveMaze(row-1, col) ||
                 solveMaze(row, col-1) ||
                 solveMaze(row+1, col) ||
@@ -290,27 +294,24 @@ class MazeCanvas extends Canvas implements ActionListener, KeyListener {
     boolean solveMaze(int row, int col,int dir) {//dir1=north,dir2=east,3=south,4=west
     	
         if (maze[row][col] == EMPTY) { 
-            // Add this cell to the path.
+   
             maze[row][col] = PATH;
             putSquare(row, col, PATH);
             
             	
             
 
-            // Path has reached goal.
+            
             if (row == rows-2 && col == columns-2)
                 return true;
 
-            // Try to solve maze by extending path in each
-            // possible direction.
             if (solveMaze(row-1, col) ||
                 solveMaze(row, col-1) ||
                 solveMaze(row+1, col) ||
                 solveMaze(row, col+1))
                 return true;
 
-            // Maze can't be solved from this cell,
-            // so backtract out of the cell.
+           
             maze[row][col] = VISITED;
             putSquare(row, col, VISITED);
         }
