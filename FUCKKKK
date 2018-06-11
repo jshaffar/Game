@@ -1,0 +1,41 @@
+import javax.swing.JOptionPane;
+import java.util.Random;
+
+public class MyWorld
+{
+
+	for(int f =0;f<=9;f++)
+	{
+	Random gen = new Random()
+	int a = gen.nextInt(9)+1;
+	int b = gen.nextInt(9)+1;
+	int c = gen.nextInt(4)+1;
+	if(c==1)
+	{
+		String s = JOptionPane.showInputDialog(a+" + "+b);
+		if(Integer.parseInt(s)!=a+b
+			System.out.println("you failed");
+	}
+	if(c==2)
+	{
+		String s = JOptionPane.showInputDialog(a+" - "+b);
+		if(Integer.parseInt(s)!=a-b
+			System.out.println("you failed");
+	}
+		if(c==3)
+	{
+		String s = JOptionPane.showInputDialog(a+" * "+b);
+		if(Integer.parseInt(s)!=a*b
+			System.out.println("you failed");
+	}
+		if(c==4)
+	{
+		String s = JOptionPane.showInputDialog(a+" / "+b);
+		if(Integer.parseInt(s)!=a/b
+			System.out.println("you failed");
+	}
+	
+	
+	
+	
+	} 
